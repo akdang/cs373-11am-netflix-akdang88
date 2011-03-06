@@ -44,6 +44,7 @@ My algorithm first reads in the precomputed files to generate efficient dictiona
 
 = Testing =
    * Smaller mv.txt files in test/ were used for unit testing the parsers.
+   * Parsers were tested separately in TestParsers.py 
 
 = Results =
   * The best RMSE was 0.971 with a weighted average of 2 heuristics: the average ratings of individual movies and the average ratings of the customers per decade. 
