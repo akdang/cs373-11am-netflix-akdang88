@@ -1,0 +1,52 @@
+# Algorithm Design #
+My algorithm first reads in the precomputed files to generate efficient dictionaries.  Then, we iterate through probe.txt (from the command line) and calculate the predicted ratings.  The predicted ratings were calculated by taking a weighted average of 2 heuristics: the average ratings of individual movies and the average ratings of the customers per decade.  Finally, the RMSE was calculated to be 0.971.  The runtime is about 3 minutes.
+
+# Optimizations #
+
+## Average Ratings of Individual Movies ##
+  * The average rating of each movie was precomputed in extra/movieIDAvgRatings.in
+  * Each line is in the form movieID=average
+  * This file was computed by the parser netflix\_movie\_avg, which iterates through each mv.txt file and computes the average
+  * The parser took about 15 minutes
+
+## Average Ratings of Individual Customers ##
+  * The average rating of each customer was precomputed in extra/custIDAvgRatings.in
+  * Each line is in the form custID=average
+  * This file was computed by the parser netflix\_cust\_avg, which iterates through each mv.txt file and computes the average per customer
+  * The parser took about 20 minutes
+
+## Average Ratings of Customers per Decade ##
+  * The average rating of each customer per decade was precomputed in extra/custDecadeAvgRatings.in
+  * The file is in the form custID: decade=average
+  * If the customer didn't rate any movies in a particular decade, the customer's average rating was used instead in the prediction rating
+  * This file was computed by the parser netflix\_decade\_avg, which iterates through each mv.txt file and computes the average per customer per decade.
+  * The parser took about 30 minutes
+
+## Average Ratings of Movies per Decade (computed, but not used) ##
+  * The average rating of movies in each decade was precomputed in extra/movieDecadeAvgRatings.in
+  * The file is in the form decade=average
+  * This file was computed by the parser netflix\_decade\_avg, which iterates through each mv.txt file and computes the average per decade.
+  * The parser took about 30 minutes
+  * This heuristic isn't used in the prediction ratings because it resulted in higher RMSEs
+
+## MovieID to Year Map ##
+  * The file extra/movie\_titles\_no\_nulls.txt is mostly the same as the original movie\_titles.txt, except NULL values for year were replaced with the actual year.
+    * More info: http://www.netflixprize.com/community/viewtopic.php?id=212
+  * The file is in the form movieID,year,movieTitle
+  * The mapping of (movieID, year) is used in the average of ratings of movies and customers per decade heuristics
+
+# Challenges #
+  * Parsing 1.4 GB of data forced me to create efficient dictionaries instead of inefficiently iterating through both probe.txt and the mv.txt files at the same time.
+  * Precomputed files were necessary to cut down on the run time
+  * Bugs were much harder to find when reading 1.4 GB of data.  Smaller mv.txt files were created and used in test/
+
+# Testing #
+  * Smaller mv.txt files in test/ were used for unit testing the parsers.
+  * Parsers were tested separately in TestParsers.py
+  * RMSE was tested in TestNetflix.py
+
+# Results #
+  * The best RMSE was 0.971 with a weighted average of 2 heuristics: the average ratings of individual movies and the average ratings of the customers per decade.
+    * If the customer didn't rate any movies in a particular decade, the customer's average rating was used instead in the prediction rating
+  * The somewhat simple solution of the average of both the average of individual movies and the average of individual customers gave RMSE = 1.003.
+  * The average of all 4 heuristics gives RMSE = 1.009
